@@ -947,6 +947,30 @@ sai_status_t VirtualSwitchSaiInterface::queryAttributeEnumValuesCapability(
 
         return SAI_STATUS_SUCCESS;
     }
+    else if (object_type == SAI_OBJECT_TYPE_HOSTIF_TRAP && attr_id == SAI_HOSTIF_TRAP_ATTR_TRAP_TYPE)
+    {
+
+        auto meta = sai_metadata_get_attr_metadata(SAI_OBJECT_TYPE_HOSTIF_TRAP, SAI_HOSTIF_TRAP_ATTR_TRAP_TYPE);
+
+        if (meta == NULL || !meta->isenum)
+        {
+            SWSS_LOG_THROW("failed to find metadata for switch SAI_HOSTIF_TRAP_ATTR_TRAP_TYPE attribute");
+        }
+
+
+        if (enum_values_capability->count < meta->enummetadata->valuescount)
+        {
+            return SAI_STATUS_BUFFER_OVERFLOW;
+        }
+
+        for (uint32_t i = 0; i < meta->enummetadata->valuescount; i++)
+        {
+            enum_values_capability->list[i] = meta->enummetadata->values[i];
+        }
+
+        return SAI_STATUS_SUCCESS;
+    }
+
     auto ss = m_switchStateMap.at(switch_id);
     return ss->queryAttrEnumValuesCapability(switch_id, object_type, attr_id, enum_values_capability);
 
